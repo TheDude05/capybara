@@ -127,7 +127,13 @@ module Capybara
       end
     end
 
-    if defined?(Process::CLOCK_MONOTONIC)
+    # `CLOCK_MONOTONIC_RAW` is Linux only. Its not affected by time adjustments
+    # from the adjtime syscall (i.e NTP).
+    if defined?(Process::CLOCK_MONOTONIC_RAW)
+      def monotonic_time
+       Process.clock_gettime Process::CLOCK_MONOTONIC_RAW
+      end
+    elsif defined?(Process::CLOCK_MONOTONIC)
       def monotonic_time
        Process.clock_gettime Process::CLOCK_MONOTONIC
       end
